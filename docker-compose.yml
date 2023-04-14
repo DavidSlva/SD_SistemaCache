@@ -1,0 +1,22 @@
+version: '3'
+services:
+  redis1:
+    image: redis
+    container_name: redis1
+    ports:
+      - "6379:6379"
+    command: redis-server --maxmemory 500mb
+
+  redis2:
+    image: redis
+    container_name: redis2
+    ports:
+      - "6380:6379"
+    command: redis-server --maxmemory 500mb
+
+  redis3:
+    image: redis
+    container_name: redis3
+    ports:
+      - "6381:6379"
+    command: redis-server --maxmemory 500mb
