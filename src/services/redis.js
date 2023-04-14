@@ -7,6 +7,29 @@ module.exports = class RedisService{
         this.client3 = redis3
     }
 
+    /**
+     * Cambiamos las políticas a LRU de todos los clientes
+     */
+
+    async setLRUPolitic(){
+        try {
+            this.client1.config("SET", "maxmemory-policy", "allkeys-lru");
+            this.client2.config("SET", "maxmemory-policy", "allkeys-lru");
+            this.client3.config("SET", "maxmemory-policy", "allkeys-lru");
+        } catch (error) {
+            throw error
+        }
+    }
+    async setLFUPolitic(){
+        try {
+            this.client1.config("SET", "maxmemory-policy", "allkeys-lfu");
+            this.client2.config("SET", "maxmemory-policy", "allkeys-lfu");
+            this.client3.config("SET", "maxmemory-policy", "allkeys-lfu");
+        } catch (error) {
+            throw error
+        }
+    }
+
     async store(id, key, value){
         try {
             //  Lógica de almacenamiento
