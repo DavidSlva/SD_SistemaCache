@@ -22,7 +22,8 @@ module.exports = (app) => {
     router.get('/posts/:id', async (req,res) => {
         const {id} = req.params
         const post = await JsonPh.get('/posts/'+id)
-        Redis.set(3, id.toString(), JSON.stringify(post))
+        console.log(id);
+        Redis.store(id, id, JSON.stringify(post))
         res.status(200).send(post)
     })
     router.get('/comments', async (req,res) => {

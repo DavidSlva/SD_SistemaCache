@@ -30,20 +30,25 @@ module.exports = class RedisService{
         }
     }
 
+    calcRedisIndex = (id) => {
+        const cIndex = (Math.floor((id - 1) / 10) % 3) + 1;
+        return cIndex
+    }
+
     async store(id, key, value){
-        try {
-            //  Lógica de almacenamiento
-            //Si quieres almacenar en el redis 1 debes colocar set(1,llave,valor)
-            //Si quieres almacenar en el redis 2 debes colocar set(2,llave,valor)
-            //Si quieres almacenar en el redis 3 debes colocar set(3,llave,valor)
-        } catch (error) {
-            
-        }
+     
+            //  Lógica de almacenamiento 
+            // Obtener el índice del Redis en el que se debe almacenar este valor
+            const cIndex = this.calcRedisIndex(id)
+
+            // Almacenar el valor en el Redis correspondiente
+            return this.set(cIndex,key.toString(), value)
+    
     }
     /**
      * 
      * @param {Number} cIndex - Indicar número del redis en el cual se almacenará (1,2 o 3)
-     * @param {Text} key - La llave con la que se almacenará el valor
+     * @param {Text} key - La llave con la que se almacenará el valor. String estricto valor.toString()
      * @param {Text} value - Valor que se almacenará. Se puede almacenar en formato JSON también.
      */
 
