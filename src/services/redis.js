@@ -35,11 +35,31 @@ module.exports = class RedisService{
         return cIndex
     }
 
-    async store(id, key, value){
-     
+    async get(key){
+        const cIndex = this.calcRedisIndex(key)
+        const client = this.getClient(cIndex)
+        const value = await client.get(key)
+        return value
+
+    }
+
+    getClient(cIndex){
+        switch (cIndex) {
+            case 1:
+                return this.client1
+            case 2:
+                return this.client2
+            case 3:
+                return this.client3
+            default:
+                reject(new Error('Indice del cliente no existe'))
+        }
+    }
+
+    async store(key, value){
             //  Lógica de almacenamiento 
             // Obtener el índice del Redis en el que se debe almacenar este valor
-            const cIndex = this.calcRedisIndex(id)
+            const cIndex = this.calcRedisIndex(key)
 
             // Almacenar el valor en el Redis correspondiente
             return this.set(cIndex,key.toString(), value)
@@ -54,29 +74,13 @@ module.exports = class RedisService{
 
     set(cIndex, key, value){
         new Promise((resolve, reject) => {
-            let client = null;
+            let client = this.getClient(cIndex);
             let a;
-            switch (cIndex) {
-                case 1:
-                    client = this.client1
-                    break;
-                case 2:
-                    client = this.client2
-                    break;
-                case 3:
-                    client = this.client3
-                    a=2
-                    break;
-                default:
-                    reject(new Error('Indice del cliente no existe'))
-            }
-            if(cIndex === 3){
-                this.client3.set(key, value, (err, reply) => {
-                    if(err)
-                        reject(err)
-                    resolve(reply)
-                })
-            }
+            client.set(key, value, (err, reply) => {
+                if(err)
+                    reject(err)
+                resolve(reply)
+            })
         })
     }
 }

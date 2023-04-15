@@ -22,9 +22,14 @@ module.exports = (app) => {
     router.get('/posts/:id', async (req,res) => {
         const {id} = req.params
         const post = await JsonPh.get('/posts/'+id)
-        console.log(id);
-        Redis.store(id, id, JSON.stringify(post))
-        res.status(200).send(post)
+        let storedValue = await Redis.get(id)
+        console.log(storedValue, 'Antes');
+        if(!storedValue){
+            storedValue = await JsonPh.get('/posts/'+id)
+            Redis.store(id, JSON.stringify(post))
+        }
+        storedValue = JSON.parse(storedValue)
+        res.status(200).send(storedValue)
     })
     router.get('/comments', async (req,res) => {
         const comments = await JsonPh.get('/comments')
