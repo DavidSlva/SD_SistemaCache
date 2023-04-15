@@ -31,19 +31,36 @@ module.exports = class RedisService{
     }
 
     async store(id, key, value){
-        try {
-            //  Lógica de almacenamiento
+     
+            //  Lógica de almacenamiento 
             //Si quieres almacenar en el redis 1 debes colocar set(1,llave,valor)
             //Si quieres almacenar en el redis 2 debes colocar set(2,llave,valor)
             //Si quieres almacenar en el redis 3 debes colocar set(3,llave,valor)
+            try {    
+            // Obtener el índice del Redis en el que se debe almacenar este valor
+            const cIndex = (Math.floor((id - 1) / 10) % 3) + 1;
+
+            // Almacenar el valor en el Redis correspondiente
+            switch (cIndex) {
+                case 1:
+                  return this.client1.set(key.toString(), value);
+                case 2:
+                  return this.client2.set(key.toString(), value);
+                case 3:
+                  return this.client3.set(key.toString(), value);
+                default:
+                  throw new Error('Indice del cliente no existe');
+    }
         } catch (error) {
+            throw error;
+
             
         }
     }
     /**
      * 
      * @param {Number} cIndex - Indicar número del redis en el cual se almacenará (1,2 o 3)
-     * @param {Text} key - La llave con la que se almacenará el valor
+     * @param {Text} key - La llave con la que se almacenará el valor. String estricto valor.toString()
      * @param {Text} value - Valor que se almacenará. Se puede almacenar en formato JSON también.
      */
 
