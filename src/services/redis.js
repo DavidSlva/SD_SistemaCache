@@ -10,7 +10,6 @@ module.exports = class RedisService{
     /**
      * Cambiamos las políticas a LRU de todos los clientes
      */
-
     async setLRUPolitic(){
         try {
             this.client1.config("SET", "maxmemory-policy", "allkeys-lru");
@@ -20,6 +19,9 @@ module.exports = class RedisService{
             throw error
         }
     }
+    /**
+     * Cambiamos las políticas a LFU a todos los clientes
+     */
     async setLFUPolitic(){
         try {
             this.client1.config("SET", "maxmemory-policy", "allkeys-lfu");
@@ -29,12 +31,21 @@ module.exports = class RedisService{
             throw error
         }
     }
-
+    /**
+     * 
+     * @param {Number} id - ID a calcular
+     * @returns - Retorna el número del cliente al que pertenece el ID
+     */
     calcRedisIndex = (id) => {
         const cIndex = (Math.floor((id - 1) / 10) % 3) + 1;
         return cIndex
     }
 
+    /**
+     * 
+     * @param {Text} key - ID del elemento que queremos obtener
+     * @returns - Retorna el valor, si no lo encuentra, devuelve null
+     */
     async get(key){
         const cIndex = this.calcRedisIndex(key)
         const client = this.getClient(cIndex)
@@ -42,6 +53,12 @@ module.exports = class RedisService{
         return value
 
     }
+
+    /**
+     * 
+     * @param {Number} cIndex - Indice del cliente que queremos obtener
+     * @returns {RedisService} - Cliente obtenido
+     */
 
     getClient(cIndex){
         switch (cIndex) {
@@ -55,14 +72,20 @@ module.exports = class RedisService{
                 reject(new Error('Indice del cliente no existe'))
         }
     }
+    /**
+     * 
+     * @param {Text} key - Llave del elemento
+     * @param {Text} value - Contenido
+     * @param {Number} expire - TTL del elemento almacenado
+     */
 
-    async store(key, value){
+    async store(key, value, expire = -1){
             //  Lógica de almacenamiento 
             // Obtener el índice del Redis en el que se debe almacenar este valor
             const cIndex = this.calcRedisIndex(key)
 
             // Almacenar el valor en el Redis correspondiente
-            return this.set(cIndex,key.toString(), value)
+            return this.set(cIndex,key.toString(), value, expire)
     
     }
     /**
@@ -70,15 +93,17 @@ module.exports = class RedisService{
      * @param {Number} cIndex - Indicar número del redis en el cual se almacenará (1,2 o 3)
      * @param {Text} key - La llave con la que se almacenará el valor. String estricto valor.toString()
      * @param {Text} value - Valor que se almacenará. Se puede almacenar en formato JSON también.
+     * @param {Number} expire - TTL del elemento a almacenar
      */
 
-    set(cIndex, key, value){
+    set(cIndex, key, value, expire){
         new Promise((resolve, reject) => {
             let client = this.getClient(cIndex);
             let a;
             client.set(key, value, (err, reply) => {
                 if(err)
                     reject(err)
+                client.expire('key', expire)
                 resolve(reply)
             })
         })
