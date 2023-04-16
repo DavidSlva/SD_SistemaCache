@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+message PostResponse {
+  string userId = 1;
+  string id = 2;
+  string title = 3;
+  string body = 4;
+}
+
+service PostService {
+  rpc GetPost(PostRequest) returns (PostResponse) {};
+}
+
+message PostRequest {
+  string id = 1;
+}
