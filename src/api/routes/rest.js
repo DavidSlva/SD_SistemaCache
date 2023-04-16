@@ -55,11 +55,30 @@ module.exports = (app) => {
         let storedValue = await Redis.get(id)
         if(!storedValue){
             storedValue = await JsonPh.get('/posts/'+id)
-            Redis.store(id, JSON.stringify(post), TTLValue)
+            Redis.store(id, JSON.stringify(storedValue), TTLValue)
         }
         res.status(200).send(storedValue)
     })
-
+    router.get('/cache/lfu/:id', async (req,res) => {
+        const {id} = req.params
+        await Redis.setLFUPolitic()
+        let storedValue = await Redis.get(id)
+        if(!storedValue){
+            storedValue = await JsonPh.get('/posts/'+id)
+            Redis.store(id, JSON.stringify(storedValue))
+        }
+        res.status(200).send(storedValue)
+    })
+    router.get('/cache/ttluncachelfu/:id', async (req,res) => {
+        const {id} = req.params
+        await Redis.setLFUPolitic()
+        let storedValue = await Redis.get(id)
+        if(!storedValue){
+            storedValue = await JsonPh.get('/posts/'+id)
+            Redis.storeInClient1(id, JSON.stringify(storedValue), TTLValue)
+        }
+        res.status(200).send(storedValue)
+    })
     /**
      * Ruta de obtención de post utilizando las siguientes técnicas
      * - TTL: TTLValue
@@ -91,4 +110,15 @@ module.exports = (app) => {
         }
         res.status(200).send(storedValue)
     })
+
+    router.get('/cache/uncachettl/:id', async (req,res) => {
+        const {id} = req.params
+        let storedValue = await Redis.get(id)
+        if(!storedValue){
+            storedValue = await JsonPh.get('/posts/'+id)
+            Redis.storeInClient1(id, JSON.stringify(storedValue), TTLValue)
+        }
+        res.status(200).send(storedValue)
+    })
+    
 }

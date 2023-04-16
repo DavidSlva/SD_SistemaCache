@@ -17,7 +17,7 @@ module.exports = (app) => {
     const Redis = new RedisService()
     router.get('/vanilla', async (req, res) => {
         try {
-            Redis.flushRedis()
+            await Redis.flushRedis()
             let value;
             // Inicio tiempo
             for(let i = 0; i < nConsultas; i++){
@@ -38,7 +38,7 @@ module.exports = (app) => {
     router.get('/ttl', async (req, res) => {
         try {
             let value;
-            Redis.flushRedis()
+            await Redis.flushRedis()
             // Inicio tiempo
             for(let i = 0; i < nConsultas; i++){
                 const id = generarValorUnoA(100)
@@ -63,7 +63,7 @@ module.exports = (app) => {
         try {
             let value;
             // Inicio tiempo
-            Redis.flushRedis()
+            await Redis.flushRedis()
             const start = new Date().getMilliseconds()
             for(let i = 0; i < nConsultas; i++){
                 const id = generarValorUnoA(100)
@@ -81,14 +81,14 @@ module.exports = (app) => {
      * - TTL: 800s
      * - Técnica de Particionamiento
      * - Política de remoción LFU
-     * - Tamaño del caché 500MB (Definido en el docker-compose)
+     * - Tamaño del caché 10MB (Definido en el docker-compose)
      * - Solo utilizamos el caché 1 
      */
     router.get('/client1/all-techniques', async (req, res) => {
         try {
             let value;
             // Inicio tiempo
-            Redis.flushRedis()
+            await Redis.flushRedis()
             const start = new Date().getMilliseconds()
             for(let i = 0; i < nConsultas; i++){
                 const id = generarValorUnoA(100)
@@ -101,4 +101,57 @@ module.exports = (app) => {
             res.send(error)
         }
     })
+    router.get('/lfu', async (req, res) => {
+        try {
+            let value;
+            // Inicio tiempo
+            await Redis.flushRedis()
+            const start = new Date().getMilliseconds()
+            for(let i = 0; i < nConsultas; i++){
+                const id = generarValorUnoA(100)
+                value = await axios.get(`${SERVER_URL}/rest/cache/lfu/${id}`)
+            }
+            const end = new Date().getMilliseconds()
+            const time = end - start
+            res.send({time})
+        } catch (error) {
+            res.send(error)
+        }
+    })
+    router.get('/ttluncachelfu', async (req, res) => {
+        try {
+            let value;
+            // Inicio tiempo
+            await Redis.flushRedis()
+            const start = new Date().getMilliseconds()
+            for(let i = 0; i < nConsultas; i++){
+                const id = generarValorUnoA(100)
+                value = await axios.get(`${SERVER_URL}/rest/cache/ttluncachelfu/${id}`)
+            }
+            const end = new Date().getMilliseconds()
+            const time = end - start
+            res.send({time})
+        } catch (error) {
+            res.send(error)
+        }
+    })
+    router.get('/uncachettl', async (req, res) => {
+        try {
+            let value;
+            // Inicio tiempo
+            await Redis.flushRedis()
+            const start = new Date().getMilliseconds()
+            for(let i = 0; i < nConsultas; i++){
+                const id = generarValorUnoA(100)
+                value = await axios.get(`${SERVER_URL}/rest/cache/uncachettl/${id}`)
+            }
+            const end = new Date().getMilliseconds()
+            const time = end - start
+            res.send({time})
+        } catch (error) {
+            res.send(error)
+        }
+    })
+    
+    
 }
