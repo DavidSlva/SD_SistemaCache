@@ -8,6 +8,6 @@ module.exports = () => {
     rest(app)
     tarea(app)
     redis(app)
-    grpc(app)
+    // grpc(app)
     return app
 }

@@ -57,7 +57,7 @@ module.exports = (app) => {
      * - TTL: 1s
      * - Técnica de Particionamiento
      * - Política de remoción LFU
-     * - Tamaño del caché 500MB (Definido en el docker-compose)
+     * - Tamaño del caché 10MB (Definido en el docker-compose)
      */
     router.get('/all-techniques', async (req, res) => {
         try {
@@ -79,7 +79,6 @@ module.exports = (app) => {
     /**
      * Ruta de obtención de post utilizando las siguientes técnicas
      * - TTL: 800s
-     * - Técnica de Particionamiento
      * - Política de remoción LFU
      * - Tamaño del caché 10MB (Definido en el docker-compose)
      * - Solo utilizamos el caché 1 

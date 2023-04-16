@@ -1,9 +1,7 @@
-Para Ejecutar los Redis debes hacer "docker build ./" en el directorio donde está el Dockerfile
-Para abrir los redis debes ejecutar "docker-compose up -d" en el directorio donde está el docker-compose.yml
-Para ejecutar el contenedor debes ejecutar  "docker build ./" estando en el directorio del Dockerfile
-npm install
-npm i nodemon
-npm start
+El repositorio se encuentra en "https://github.com/DavidSlva/SD_SistemaCache/tree/master"
+Debes clonar el repositorio, luego colocar en consola "docker-compose up".
+Para inicial la APP "npm start"
+
 
 
 

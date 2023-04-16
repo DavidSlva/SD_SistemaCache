@@ -20,3 +20,12 @@ services:
     ports:
       - "6381:6379"
     command: redis-server --maxmemory 10mb
+
+  node:
+    image: node:14-alpine
+    container_name: node
+    volumes:
+      - .:/app
+    working_dir: /app
+
+    command: "npm install"
