@@ -9,7 +9,8 @@ module.exports = (app) => {
             let value;
             // Inicio tiempo
             for(let i = 0; i < 1000; i++){
-                value = await axios.get(`${SERVER_URL}/rest/vanilla/posts/1`)
+                const id = generarValorUnoA(100)
+                value = await axios.get(`${SERVER_URL}/rest/vanilla/posts/${id}`)
             }
             // FIN tiempo
             //Devolver tiempo total
@@ -24,7 +25,8 @@ module.exports = (app) => {
             let value;
             // Inicio tiempo
             for(let i = 0; i < 1000; i++){
-                value = await axios.get(`${SERVER_URL}/rest/cache/ttl/1`)
+                const id = generarValorUnoA(100)
+                value = await axios.get(`${SERVER_URL}/rest/cache/ttl/${id}`)
             }
             // FIN tiempo
             //Devolver tiempo total
@@ -39,7 +41,8 @@ module.exports = (app) => {
             let value;
             // Inicio tiempo
             for(let i = 0; i < 1000; i++){
-                value = await axios.get(`${SERVER_URL}/rest/cache/all-techniques/1`)
+                const id = generarValorUnoA(100)
+                value = await axios.get(`${SERVER_URL}/rest/cache/all-techniques/${id}`)
             }
             // FIN tiempo
             //Devolver tiempo total con la cantidad de consultas que se hicieron
