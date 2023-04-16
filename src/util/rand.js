@@ -9,3 +9,8 @@ function generarNumeroAleatorio(m) {
 function generarValorUnoA(to) {
     return Math.floor(Math.random() * to) + 1;
 }
+
+module.exports = {
+    generarValorUnoA,
+    generarNumeroAleatorio
+}

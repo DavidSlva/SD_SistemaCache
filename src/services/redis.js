@@ -12,9 +12,9 @@ module.exports = class RedisService{
      */
     async setLRUPolitic(){
         try {
-            this.client1.config("SET", "maxmemory-policy", "allkeys-lru");
-            this.client2.config("SET", "maxmemory-policy", "allkeys-lru");
-            this.client3.config("SET", "maxmemory-policy", "allkeys-lru");
+            this.client1.configSet("SET", "maxmemory-policy", "allkeys-lru");
+            this.client2.configSet("SET", "maxmemory-policy", "allkeys-lru");
+            this.client3.configSet("SET", "maxmemory-policy", "allkeys-lru");
         } catch (error) {
             throw error
         }
@@ -24,9 +24,9 @@ module.exports = class RedisService{
      */
     async setLFUPolitic(){
         try {
-            this.client1.config("SET", "maxmemory-policy", "allkeys-lfu");
-            this.client2.config("SET", "maxmemory-policy", "allkeys-lfu");
-            this.client3.config("SET", "maxmemory-policy", "allkeys-lfu");
+            this.client1.configSet("maxmemory-policy", "allkeys-lfu");
+            this.client2.configSet("maxmemory-policy", "allkeys-lfu");
+            this.client3.configSet("maxmemory-policy", "allkeys-lfu");
         } catch (error) {
             throw error
         }
@@ -42,6 +42,15 @@ module.exports = class RedisService{
     }
 
     /**
+     * Obtiene los elementos del cliente 1 respecto a la llave key
+     * @param {Text} key - ID del elemento que queremos obtener
+     * @returns - Retorna el valor, si no lo encuentra, devuelve null
+     */
+    async getClient1(key){
+        const value = await this.client1.get(key)
+        return value
+    }
+    /**
      * 
      * @param {Text} key - ID del elemento que queremos obtener
      * @returns - Retorna el valor, si no lo encuentra, devuelve null
@@ -53,6 +62,18 @@ module.exports = class RedisService{
         return value
 
     }
+
+    /**
+     * Elimina todos los elementos de mis redis
+     */
+
+    async flushRedis(){
+        await this.client1.flushDb()
+        await this.client2.flushDb()
+        await this.client3.flushDb()
+    }
+
+    
 
     /**
      * 
@@ -72,22 +93,31 @@ module.exports = class RedisService{
                 reject(new Error('Indice del cliente no existe'))
         }
     }
+
+
     /**
      * 
      * @param {Text} key - Llave del elemento
      * @param {Text} value - Contenido
      * @param {Number} expire - TTL del elemento almacenado
      */
+    async storeInClient1(key, value){
+        return this.set(1, key.toString(), value)
+    }
 
+    /**
+     * 
+     * @param {Text} key - Llave del elemento
+     * @param {Text} value - Contenido
+     * @param {Number} expire - TTL del elemento almacenado
+     */
     async store(key, value, expire = -1){
-            //  Lógica de almacenamiento 
             // Obtener el índice del Redis en el que se debe almacenar este valor
             const cIndex = this.calcRedisIndex(key)
-
             // Almacenar el valor en el Redis correspondiente
             return this.set(cIndex,key.toString(), value, expire)
-    
     }
+
     /**
      * 
      * @param {Number} cIndex - Indicar número del redis en el cual se almacenará (1,2 o 3)

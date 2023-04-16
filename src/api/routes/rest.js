@@ -2,6 +2,8 @@ const express = require('express')
 const JsonPhService = require('../../services/jsonPh')
 const RedisService = require('../../services/redis')
 const router = express.Router()
+
+const TTLValue = 1
 module.exports = (app) => {
     app.use('/rest', router)
 
@@ -33,7 +35,6 @@ module.exports = (app) => {
      */
     router.get('/cache/posts/:id', async (req, res) => {
         const {id} = req.params
-        const post = await JsonPh.get('/posts/'+id)
         // Obtenemos el valor desde el caché
         let storedValue = await Redis.get(id)
         // Si no existe, se obtiene de la API y se almacena en caché
@@ -47,35 +48,46 @@ module.exports = (app) => {
 
 
     /**
-     * Ruta de obtención de post utilizando TTL = 60s
+     * Ruta de obtención de post utilizando TTL = TTLValue
      */
     router.get('/cache/ttl/:id', async (req,res) => {
         const {id} = req.params
-        const post = await JsonPh.get('/posts/'+id)
         let storedValue = await Redis.get(id)
         if(!storedValue){
             storedValue = await JsonPh.get('/posts/'+id)
-            Redis.store(id, JSON.stringify(post), 60)
+            Redis.store(id, JSON.stringify(post), TTLValue)
         }
         res.status(200).send(storedValue)
     })
 
     /**
      * Ruta de obtención de post utilizando las siguientes técnicas
-     * - TTL: 800s
+     * - TTL: TTLValue
      * - Técnica de Particionamiento
      * - Política de remoción LFU
      * - Tamaño del caché 500MB (Definido en el docker-compose)
      */
     router.get('/cache/all-techniques/:id', async (req,res) => {
         const {id} = req.params
-        const post = await JsonPh.get('/posts/'+id)
         // Cambiamos la política de remoción a LFU
         Redis.setLFUPolitic()
         let storedValue = await Redis.get(id)
         if(!storedValue){
             storedValue = await JsonPh.get('/posts/'+id)
-            Redis.store(id, JSON.stringify(post), 800)
+            Redis.store(id, JSON.stringify(storedValue), TTLValue)
+        }
+        res.status(200).send(storedValue)
+    })
+
+
+    router.get('/posts/cache/client1/all-techniques/:id', async (req, res) => {
+        const {id} = req.params
+        // Cambiamos la política de remoción a LFU
+        Redis.setLFUPolitic()
+        let storedValue = await Redis.getClient1(id)
+        if(!storedValue){
+            storedValue = await JsonPh.get('/posts/'+id)
+            Redis.storeInClient1(id, JSON.stringify(storedValue), TTLValue)
         }
         res.status(200).send(storedValue)
     })
